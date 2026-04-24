@@ -1,5 +1,7 @@
 # Brain Games — Cartridge Deck
 
+🚀 **[Live Demo](https://kylemath.github.io/BrainGames)** 🚀
+
 ![Style — 90s Nintendo cartridge selector](https://img.shields.io/badge/style-90s_cartridge_selector-f7d51d?style=for-the-badge)
 ![Runtime — static HTML + p5.js](https://img.shields.io/badge/runtime-static_HTML_%2B_p5.js-3b1f5a?style=for-the-badge)
 ![Hardware — Muse or simulator](https://img.shields.io/badge/hardware-Muse_or_simulator-ff4aa0?style=for-the-badge)
