@@ -3,13 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Force the browser to revalidate every load. Without these, a stale
+       cached copy of this file (or of the p5 CDN URL it used to point at)
+       can keep showing the old `addModule` error after a script-tag swap. -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Brain Games — Play</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/main.css?v=20260424">
 
   <style>
     html, body { height: 100%; overflow: hidden; }
@@ -90,36 +96,40 @@
     </div>
   </div>
 
-  <!-- p5 (required for the game runner).
-       Pinned to 1.7.0 to match the main Brainimation app. The 1.9.x
-       `p5.sound.min.js` calls `audioContext.audioWorklet.addModule(...)`
-       at script load time, which throws `Cannot read properties of
-       undefined (reading 'addModule')` in browsers that haven't unlocked
-       an AudioContext yet. 1.7.0 defers worklet registration until the
-       first audio use, which matches our needs (sound starts only after
-       a user gesture, if at all). -->
+  <!-- p5.js core only — p5.sound is deliberately NOT loaded.
+       None of the cartridges use audio, and `p5.sound.min.js` has a
+       history of calling `audioContext.audioWorklet.addModule(...)` at
+       script-load time, which throws
+         "Cannot read properties of undefined (reading 'addModule')"
+       in browsers that haven't unlocked an AudioContext yet. Dropping
+       the include removes the entire failure mode.
+       If a future game needs audio, guard the import behind a user
+       gesture (e.g. inject the p5.sound script only after the simulator
+       or Muse button click) so the AudioContext is already unlocked. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/addons/p5.sound.min.js"></script>
 
-  <!-- EEG plumbing (data first, then classes). -->
-  <script src="./core/eegData.js"></script>
-  <script src="./core/eegSimulator.js"></script>
-  <script src="./vendor/muse-browser.js"></script>
-  <script src="./core/museManager.js"></script>
+  <!-- EEG plumbing (data first, then classes). Cache-busted so edits to
+       the runner or boot scripts always re-fetch — relevant here because
+       earlier builds of this page loaded a different p5 version and the
+       browser may still have the old HTML cached. -->
+  <script src="./core/eegData.js?v=20260424"></script>
+  <script src="./core/eegSimulator.js?v=20260424"></script>
+  <script src="./vendor/muse-browser.js?v=20260424"></script>
+  <script src="./core/museManager.js?v=20260424"></script>
 
   <!-- Shared helpers (window.BGShared). Loaded before any game source so
        games can use BGShared.makeSmoother, drawBar, drawCrowd, etc. -->
-  <script src="./shared/styling90s.js"></script>
-  <script src="./shared/eegSmoothing.js"></script>
-  <script src="./shared/hud.js"></script>
-  <script src="./shared/intro.js"></script>
-  <script src="./shared/crowd.js"></script>
+  <script src="./shared/styling90s.js?v=20260424"></script>
+  <script src="./shared/eegSmoothing.js?v=20260424"></script>
+  <script src="./shared/hud.js?v=20260424"></script>
+  <script src="./shared/intro.js?v=20260424"></script>
+  <script src="./shared/crowd.js?v=20260424"></script>
 
   <!-- Persistent session state (simulator on/off + controller detection). -->
-  <script src="./core/sessionState.js"></script>
+  <script src="./core/sessionState.js?v=20260424"></script>
 
   <!-- Runner + play wiring. -->
-  <script src="./core/gameRunner.js"></script>
-  <script src="./core/playBoot.js"></script>
+  <script src="./core/gameRunner.js?v=20260424"></script>
+  <script src="./core/playBoot.js?v=20260424"></script>
 </body>
 </html>

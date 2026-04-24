@@ -3,13 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Disable HTML caching so pages always pick up the latest script
+       references. See play.html for the backstory on why this matters. -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Brain Games — Cartridge Deck</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/main.css?v=20260424">
 </head>
 <body>
   <div class="crt-scanlines" aria-hidden="true"></div>
@@ -65,16 +70,18 @@
     </footer>
   </main>
 
-  <!-- EEG plumbing (order matters: data first, then classes). -->
-  <script src="./core/eegData.js"></script>
-  <script src="./core/eegSimulator.js"></script>
-  <script src="./vendor/muse-browser.js"></script>
-  <script src="./core/museManager.js"></script>
+  <!-- EEG plumbing (order matters: data first, then classes). All script
+       URLs carry a version query string so a stale browser cache can't
+       serve an older, incompatible build after a deploy. -->
+  <script src="./core/eegData.js?v=20260424"></script>
+  <script src="./core/eegSimulator.js?v=20260424"></script>
+  <script src="./vendor/muse-browser.js?v=20260424"></script>
+  <script src="./core/museManager.js?v=20260424"></script>
 
   <!-- Persistent session state (simulator on/off + controller detection). -->
-  <script src="./core/sessionState.js"></script>
+  <script src="./core/sessionState.js?v=20260424"></script>
 
   <!-- Picker wiring (connection gate, grid placeholder). -->
-  <script src="./core/pickerBoot.js"></script>
+  <script src="./core/pickerBoot.js?v=20260424"></script>
 </body>
 </html>
