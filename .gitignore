@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs / temp
+*.log
+.tmp/
+
+# Node (only if you ever add one — this project is dep-free by design)
+node_modules/
+
+# Python bytecode (for tools/)
+__pycache__/
+*.pyc

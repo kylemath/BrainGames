@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Brain Games Core — Smoke Test</title>
+</head>
+<body style="font-family: monospace; background: #111; color: #6cff83; padding: 16px;">
+  <h1 style="color: #f7d51d;">brainGames/core smoke test</h1>
+  <p>Open the DevTools console. You should see <code>eegData.alpha</code> values every second once the simulator starts.</p>
+  <pre id="out" style="white-space: pre-wrap;"></pre>
+
+  <!-- Load order matters: eegData.js first, then the classes. -->
+  <script src="./eegData.js"></script>
+  <script src="./eegSimulator.js"></script>
+  <script src="./museManager.js"></script>
+  <script>
+    (function () {
+      var out = document.getElementById('out');
+      function log(line) {
+        var stamp = new Date().toISOString().slice(11, 19);
+        out.textContent += '[' + stamp + '] ' + line + '\n';
+        if (typeof console !== 'undefined') console.log(line);
+      }
+
+      if (!window.eegData) { log('FAIL: window.eegData missing'); return; }
+      if (typeof window.EEGSimulator !== 'function') { log('FAIL: window.EEGSimulator missing'); return; }
+      if (typeof window.MuseEEGManager !== 'function') { log('FAIL: window.MuseEEGManager missing'); return; }
+
+      log('globals present: eegData / EEGSimulator / MuseEEGManager');
+
+      var sim = new window.EEGSimulator();
+      sim.onUpdate = function () {}; // explicit no-op for demo
+      sim.start();
+      log('simulator started');
+
+      var ticks = 0;
+      var interval = setInterval(function () {
+        ticks++;
+        log('alpha=' + window.eegData.alpha.toFixed(3)
+          + '  beta=' + window.eegData.beta.toFixed(3)
+          + '  att=' + window.eegData.attention.toFixed(3));
+        if (ticks >= 10) {
+          clearInterval(interval);
+          sim.stop();
+          log('simulator stopped after 10 samples');
+        }
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brain Games — Cartridge Deck</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <div class="crt-scanlines" aria-hidden="true"></div>
+
+  <header class="top-bar">
+    <div class="title-chrome">BRAIN GAMES</div>
+    <div class="press-start">PRESS START</div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1 class="hero-title">CARTRIDGE DECK</h1>
+      <p class="hero-sub small">PLUG IN YOUR BRAIN. PICK A CARTRIDGE. PLAY.</p>
+    </section>
+
+    <section class="pixel-frame gate" aria-label="Connection gate">
+      <h2>CONNECTION GATE</h2>
+      <div class="gate-row">
+        <div class="gate-light" id="light-keyboard">
+          <div class="dot" aria-hidden="true"></div>
+          <div class="label">KEYBOARD</div>
+        </div>
+        <div class="gate-light" id="light-mouse">
+          <div class="dot" aria-hidden="true"></div>
+          <div class="label">MOUSE</div>
+        </div>
+        <div class="gate-light" id="light-brain">
+          <div class="dot" aria-hidden="true"></div>
+          <div class="label">BRAIN</div>
+        </div>
+      </div>
+
+      <div class="gate-actions">
+        <button id="btn-muse" type="button" class="pixel-btn accent-chrome">CONNECT MUSE</button>
+        <button id="btn-simulator" type="button" class="pixel-btn">USE SIMULATOR</button>
+      </div>
+
+      <p id="gate-status" class="gate-status">WAITING FOR: KEYBOARD / MOUSE / BRAIN</p>
+      <p id="muse-log" class="small" style="text-align:center; min-height: 1.2em; margin-top: 4px;"></p>
+    </section>
+
+    <section class="pixel-frame deck-wrap locked" id="deck-wrap" aria-label="Cartridge slots">
+      <h2>CARTRIDGE SLOTS</h2>
+      <p class="deck-locked-msg">LIGHTS UP ALL THREE — KEYBOARD / MOUSE / BRAIN</p>
+      <div class="cartridge-grid" id="cartridge-grid">
+        <!-- filled by pickerBoot.js -->
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>NOT AFFILIATED WITH ANY CONSOLE MANUFACTURER. ALL TRADEMARKS BELONG TO THEIR OWNERS.</p>
+      <p>BRAIN GAMES v0.1 — FOUNDATION BUILD</p>
+    </footer>
+  </main>
+
+  <!-- EEG plumbing (order matters: data first, then classes). -->
+  <script src="./core/eegData.js"></script>
+  <script src="./core/eegSimulator.js"></script>
+  <script src="./vendor/muse-browser.js"></script>
+  <script src="./core/museManager.js"></script>
+
+  <!-- Persistent session state (simulator on/off + controller detection). -->
+  <script src="./core/sessionState.js"></script>
+
+  <!-- Picker wiring (connection gate, grid placeholder). -->
+  <script src="./core/pickerBoot.js"></script>
+</body>
+</html>

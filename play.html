@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brain Games — Play</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./styles/main.css">
+
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <div class="crt-scanlines" aria-hidden="true"></div>
+
+  <header class="top-bar">
+    <a href="./index.html" class="back-link">&#9664; BACK TO DECK</a>
+    <div class="title-chrome" id="game-title">LOADING...</div>
+    <div class="live-readout" id="live-readout">ATT --- MED ---</div>
+  </header>
+
+  <div class="play-stage">
+    <div class="tv-set" role="presentation">
+      <div class="tv-cabinet">
+        <div class="tv-screen-area">
+          <div class="tv-brand" aria-hidden="true">BRAINTENDO</div>
+          <div class="tv-screen-bezel">
+            <div class="tv-screen-inner">
+              <div class="tv-crt-surface">
+                <div id="game-container"></div>
+                <div class="tv-crt-glare" aria-hidden="true"></div>
+                <div class="tv-crt-scanlines" aria-hidden="true"></div>
+                <div class="tv-crt-vignette" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+          <div class="tv-model-plate" aria-hidden="true">MODEL BT-808 &middot; EEG ENTERTAINMENT SYSTEM</div>
+        </div>
+
+        <div class="tv-control-panel" aria-hidden="true">
+          <div class="tv-led-row">
+            <div class="tv-led power-led" title="POWER"></div>
+            <div class="tv-led-label">POWER</div>
+          </div>
+          <div class="tv-channel-readout">
+            <div class="tv-channel-label">CH</div>
+            <div class="tv-channel-num" id="tv-channel-num">01</div>
+            <div class="tv-channel-arrows">
+              <button type="button" class="tv-ch-arrow" id="btn-ch-prev" aria-label="Previous cartridge" title="Previous cartridge ( [ )">&#9664;</button>
+              <button type="button" class="tv-ch-arrow" id="btn-ch-next" aria-label="Next cartridge"     title="Next cartridge ( ] )">&#9654;</button>
+            </div>
+          </div>
+          <div class="tv-knob-wrap">
+            <div class="tv-knob is-clickable" data-knob="knob-channel" role="button" tabindex="0" aria-label="Change channel">
+              <div class="tv-knob-pointer"></div>
+            </div>
+            <div class="tv-knob-label">CHANNEL</div>
+          </div>
+          <div class="tv-knob-wrap">
+            <div class="tv-knob" data-knob="knob-volume"><div class="tv-knob-pointer"></div></div>
+            <div class="tv-knob-label">VOLUME</div>
+          </div>
+          <div class="tv-speaker-grille">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+      <div class="tv-stand" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="gate-modal" role="dialog" aria-modal="true" aria-labelledby="gate-modal-title">
+    <div class="modal pixel-frame accent-yellow">
+      <h2 id="gate-modal-title">PLUG IN A BRAIN OR PRESS SIMULATE</h2>
+      <p class="small">THIS CARTRIDGE NEEDS EEG INPUT TO START.</p>
+      <div class="actions">
+        <button type="button" class="pixel-btn accent-chrome" id="modal-muse">CONNECT MUSE</button>
+        <button type="button" class="pixel-btn" id="modal-sim">USE SIMULATOR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- p5 (required for the game runner).
+       Pinned to 1.7.0 to match the main Brainimation app. The 1.9.x
+       `p5.sound.min.js` calls `audioContext.audioWorklet.addModule(...)`
+       at script load time, which throws `Cannot read properties of
+       undefined (reading 'addModule')` in browsers that haven't unlocked
+       an AudioContext yet. 1.7.0 defers worklet registration until the
+       first audio use, which matches our needs (sound starts only after
+       a user gesture, if at all). -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/addons/p5.sound.min.js"></script>
+
+  <!-- EEG plumbing (data first, then classes). -->
+  <script src="./core/eegData.js"></script>
+  <script src="./core/eegSimulator.js"></script>
+  <script src="./vendor/muse-browser.js"></script>
+  <script src="./core/museManager.js"></script>
+
+  <!-- Shared helpers (window.BGShared). Loaded before any game source so
+       games can use BGShared.makeSmoother, drawBar, drawCrowd, etc. -->
+  <script src="./shared/styling90s.js"></script>
+  <script src="./shared/eegSmoothing.js"></script>
+  <script src="./shared/hud.js"></script>
+  <script src="./shared/intro.js"></script>
+  <script src="./shared/crowd.js"></script>
+
+  <!-- Persistent session state (simulator on/off + controller detection). -->
+  <script src="./core/sessionState.js"></script>
+
+  <!-- Runner + play wiring. -->
+  <script src="./core/gameRunner.js"></script>
+  <script src="./core/playBoot.js"></script>
+</body>
+</html>

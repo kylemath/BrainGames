@@ -1,0 +1,119 @@
+[
+  {
+    "id": "GolfShooter",
+    "title": "Golf Driving Range",
+    "category": "Sports",
+    "order": 10,
+    "file": "games/GolfShooter.js",
+    "newGame": false,
+    "mappingOneLiner": "attention -> shot power"
+  },
+  {
+    "id": "archeryShooter",
+    "title": "Archery Range",
+    "category": "Sports",
+    "order": 11,
+    "file": "games/archeryShooter.js",
+    "newGame": false,
+    "mappingOneLiner": "attention -> hand steadiness"
+  },
+  {
+    "id": "bballShooter",
+    "title": "Basketball",
+    "category": "Sports",
+    "order": 12,
+    "file": "games/bballShooter.js",
+    "newGame": false,
+    "mappingOneLiner": "attention -> shot accuracy"
+  },
+  {
+    "id": "soccerPenalty",
+    "title": "Soccer Shoot-Out",
+    "category": "Sports",
+    "order": 13,
+    "file": "games/soccerPenalty.js",
+    "newGame": false,
+    "mappingOneLiner": "attention -> reticle stability"
+  },
+  {
+    "id": "RowingCalm",
+    "title": "Rowing Calm",
+    "category": "Calm",
+    "order": 20,
+    "file": "games/RowingCalm.js",
+    "newGame": false,
+    "mappingOneLiner": "meditation -> stroke rhythm"
+  },
+  {
+    "id": "balanceBeam",
+    "title": "Balance Beam",
+    "category": "Calm",
+    "order": 21,
+    "file": "games/balanceBeam.js",
+    "newGame": false,
+    "mappingOneLiner": "meditation -> balance (sway)"
+  },
+  {
+    "id": "balloonPop",
+    "title": "Balloon Pop",
+    "category": "Calm",
+    "order": 22,
+    "file": "games/balloonPop.js",
+    "newGame": false,
+    "mappingOneLiner": "attention -> balloon inflation"
+  },
+  {
+    "id": "deepDiver",
+    "title": "Deep Sea Diver",
+    "category": "Calm",
+    "order": 23,
+    "file": "games/deepDiver.js",
+    "newGame": false,
+    "mappingOneLiner": "meditation -> oxygen management"
+  },
+  {
+    "id": "mazeFocus",
+    "title": "Maze Focus (Navigator)",
+    "category": "Focus",
+    "order": 25,
+    "file": "games/mazeFocus.js",
+    "newGame": false,
+    "mappingOneLiner": "attention -> movement speed"
+  },
+  {
+    "id": "reactionRace",
+    "title": "F1 Reaction Race",
+    "category": "Focus",
+    "order": 26,
+    "file": "games/reactionRace.js",
+    "newGame": false,
+    "mappingOneLiner": "attention -> pre-stimulus alertness"
+  },
+  {
+    "id": "snakeFeast",
+    "title": "Snake Feast",
+    "category": "Brain Games",
+    "order": 30,
+    "file": "games/snakeFeast.js",
+    "newGame": true,
+    "mappingOneLiner": "alpha -> assistive auto-steer toward nearest pellet (see applyAlphaAssist)"
+  },
+  {
+    "id": "ZenBreakout",
+    "title": "Zen Breakout",
+    "category": "Brain Games",
+    "order": 35,
+    "file": "games/ZenBreakout.js",
+    "newGame": true,
+    "mappingOneLiner": "meditation -> paddle width (72px..196px, smoothed ~1s, ~30-frame rolling avg)"
+  },
+  {
+    "id": "Brainvaders",
+    "title": "Brainvaders",
+    "category": "Brain Games",
+    "order": 40,
+    "file": "games/Brainvaders.js",
+    "newGame": true,
+    "mappingOneLiner": "beta -> cannon fire-rate (cooldown 900ms..120ms)"
+  }
+]
