@@ -206,23 +206,47 @@
       // at load() time would see `undefined`.
       var realCreateCanvas = global.createCanvas;
 
-      if (typeof realCreateCanvas === 'function') {
-        global.createCanvas = function brainGamesCreateCanvas(/* w, h, renderer */) {
-          // Ignore any w/h the sketch passed; keep optional renderer arg
-          // (P2D / WEBGL). Fall back to P2D if not specified.
-          var rendererArg = arguments.length >= 3 ? arguments[2] : undefined;
-          userCanvasRenderer = (typeof rendererArg === 'undefined')
-            ? realCreateCanvas(TUBE_WIDTH, TUBE_HEIGHT)
-            : realCreateCanvas(TUBE_WIDTH, TUBE_HEIGHT, rendererArg);
-          return userCanvasRenderer;
-        };
-      }
-
       // Force windowWidth/windowHeight to the tube dimensions so sketches
       // that use them for layout (e.g. `createCanvas(windowWidth, windowHeight - 48)`
       // or `cols = windowWidth / cellPx`) stay self-consistent.
       global.windowWidth = TUBE_WIDTH;
       global.windowHeight = TUBE_HEIGHT + STATUS_BAR_HEIGHT;
+
+      // Pre-create the canvas at tube size BEFORE running the user's setup.
+      // Many of the original Brainimation sketches read `width` and `height`
+      // inside their own setup() to position elements (e.g. `targetCX = width
+      // * 0.5`, `goalX = width / 2`, `mazeOffX = (width - cellW * cols) / 2`).
+      // Before createCanvas() is called, p5 defaults width/height to 100×100,
+      // which would shove every centred target into the top-left corner. By
+      // calling createCanvas first we guarantee the user setup sees the real
+      // 800×600 dimensions.
+      if (typeof realCreateCanvas === 'function') {
+        try {
+          userCanvasRenderer = realCreateCanvas(TUBE_WIDTH, TUBE_HEIGHT);
+        } catch (e) {
+          console.error('[BrainGamesRunner] initial createCanvas failed:', e);
+        }
+      }
+
+      // If the user setup also calls createCanvas (e.g. with WEBGL), honour
+      // the renderer choice but keep the tube dimensions. If the requested
+      // renderer matches what we already created, return the existing canvas
+      // unchanged to avoid replacing it.
+      if (typeof realCreateCanvas === 'function') {
+        global.createCanvas = function brainGamesCreateCanvas(/* w, h, renderer */) {
+          var rendererArg = arguments.length >= 3 ? arguments[2] : undefined;
+          if (typeof rendererArg === 'undefined') {
+            return userCanvasRenderer;
+          }
+          // Renderer explicitly requested (P2D / WEBGL) — recreate at tube size.
+          try {
+            userCanvasRenderer = realCreateCanvas(TUBE_WIDTH, TUBE_HEIGHT, rendererArg);
+          } catch (e) {
+            console.error('[BrainGamesRunner] user createCanvas failed:', e);
+          }
+          return userCanvasRenderer;
+        };
+      }
 
       if (typeof userSetup === 'function') {
         try {
@@ -236,16 +260,6 @@
       // (e.g. its own windowResized) wants to call it.
       if (typeof realCreateCanvas === 'function') {
         global.createCanvas = realCreateCanvas;
-      }
-
-      // If the game didn't call createCanvas itself (legacy sketches),
-      // do it for them at the tube size.
-      if (!userCanvasRenderer && typeof realCreateCanvas === 'function') {
-        try {
-          userCanvasRenderer = realCreateCanvas(TUBE_WIDTH, TUBE_HEIGHT);
-        } catch (e) {
-          console.error('[BrainGamesRunner] fallback createCanvas failed:', e);
-        }
       }
 
       // Find the live canvas and parent it into #game-container.

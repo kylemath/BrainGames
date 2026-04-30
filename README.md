@@ -53,20 +53,24 @@ CHANNEL knob is clickable — rotate through cartridges without leaving the
 TV screen. Left-click = next, right-click = previous. Arrow buttons under
 the channel readout and `[` / `]` keyboard shortcuts do the same thing.
 
-**Thirteen games across four categories:**
+**Fourteen games across four categories:**
 
 | Category    | Games                                                              |
 |-------------|---------------------------------------------------------------------|
 | Sports      | Golf Driving Range · Archery Range · Basketball · Soccer Shoot-out |
 | Calm        | Rowing · Balance Beam · Balloon Pop · Deep Sea Diver               |
 | Focus       | Maze Navigator · Reaction Race                                     |
-| Brain Games | Snake Feast · Zen Breakout · Brainvaders                           |
+| Brain Games | Snake Feast · Zen Breakout · Brainvaders · EEG FPS Range           |
 
-The three **Brain Games** titles are original arcade-classic rethinks
+The four **Brain Games** titles are original arcade-classic rethinks
 built specifically for this package — a Snake variant driven by alpha
 waves (with food, growing body, self-collision, score), Breakout with
-meditation-controlled paddle width, and a Space-Invaders-style wave
-shooter where beta sets cannon cooldown and meditation powers a shield.
+meditation-controlled paddle width, a Space-Invaders-style wave
+shooter where beta sets cannon cooldown and meditation powers a
+shield, and a pseudo-3D first-person target range (a port of
+[Joe Gannon's Unity + BlueMuse "EEG FPS"](https://github.com/j-gannon/EEG-FPS-Game))
+where attention tightens the crosshair, meditation steadies the aim,
+beta sets fire-rate, and gamma triggers a 3-shot burst.
 
 **Zero editor chrome.** No Monaco, no AI assistant, no docs panel, no code
 saves — the picker and runner are the entire interface.
@@ -205,6 +209,7 @@ BrainGames/
 │   ├── snakeFeast.js      — New: classic snake + food + alpha-assist
 │   ├── ZenBreakout.js     — New: breakout with meditation-width paddle
 │   ├── Brainvaders.js     — New: wave shooter with shield + spread-shot
+│   ├── eegFPS.js          — New: pseudo-3D FPS port of j-gannon/EEG-FPS-Game
 │   └── … 10 classic EEG games …
 ├── styles/
 │   └── main.css           — Palette, picker chrome, TV set, CRT overlay

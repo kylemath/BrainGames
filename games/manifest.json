@@ -115,5 +115,14 @@
     "file": "games/Brainvaders.js",
     "newGame": true,
     "mappingOneLiner": "beta -> cannon fire-rate (cooldown 900ms..120ms)"
+  },
+  {
+    "id": "eegFPS",
+    "title": "EEG FPS Range",
+    "category": "Brain Games",
+    "order": 50,
+    "file": "games/eegFPS.js",
+    "newGame": true,
+    "mappingOneLiner": "attention -> crosshair tightness (focus shrinks the reticle, low focus widens + jitters it)"
   }
 ]

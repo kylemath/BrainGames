@@ -541,6 +541,80 @@
       ctx.arc(ox + dx2 * cs + cs / 2, oy + dy2 * cs + cs / 2, cs * 0.28, 0, Math.PI * 2);
       ctx.fill();
     },
+    eegFPS: function (ctx, t, w, h, p) {
+      // Pseudo-3D cartridge preview: gridded floor, drifting target cubes,
+      // a center crosshair that pulses with a fake "focus" oscillation.
+      ctx.fillStyle = p.ink; ctx.fillRect(0, 0, w, h);
+
+      // Sky / horizon split
+      var horizonY = h * 0.55;
+      ctx.fillStyle = 'rgba(59,31,90,0.7)';
+      ctx.fillRect(0, 0, w, horizonY);
+      ctx.fillStyle = p.pink;
+      ctx.fillRect(0, horizonY - 1, w, 1);
+
+      // Perspective grid lines (z-stripes)
+      ctx.strokeStyle = 'rgba(108,255,131,0.55)';
+      ctx.lineWidth = 1;
+      for (var i = 1; i <= 4; i++) {
+        var lineY = horizonY + Math.pow(i / 4, 1.6) * (h - horizonY);
+        ctx.beginPath();
+        ctx.moveTo(0, lineY);
+        ctx.lineTo(w, lineY);
+        ctx.stroke();
+      }
+      // Vanishing-point stripes
+      var vx = w / 2;
+      ctx.strokeStyle = 'rgba(108,255,131,0.35)';
+      for (var k = -3; k <= 3; k++) {
+        ctx.beginPath();
+        ctx.moveTo(vx + k * 18, horizonY);
+        ctx.lineTo(vx + k * (w / 2), h);
+        ctx.stroke();
+      }
+
+      // Target cubes drifting across, scaled by depth
+      for (var n = 0; n < 3; n++) {
+        var phase = ((t * 0.6) + n * 0.7) % 1;
+        var depth = 0.25 + (1 - phase) * 0.75;       // 1.0 = far, 0.25 = near
+        var sz = 8 + (1 - depth) * 14;
+        var cx = w * 0.5 + Math.sin((t * 0.9) + n * 1.4) * (w * 0.32) * (1 - depth);
+        var cy = horizonY - 6 - (1 - depth) * 14 + Math.cos((t * 1.3) + n) * 3;
+        var col = (n === 0) ? p.green : (n === 1) ? p.yellow : p.pink;
+        // Top face (lighter)
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillRect(cx - sz / 2 + 2, cy - sz / 2 - 3, sz, 3);
+        // Front face
+        ctx.fillStyle = col;
+        ctx.fillRect(cx - sz / 2, cy - sz / 2, sz, sz);
+        ctx.strokeStyle = p.chrome;
+        ctx.strokeRect(cx - sz / 2 + 0.5, cy - sz / 2 + 0.5, sz - 1, sz - 1);
+      }
+
+      // Crosshair (pulses with a sine — the "focus" tightening / loosening)
+      var pulse = 0.5 + 0.5 * Math.sin(t * 2.4);
+      var rR = 8 + pulse * 14;
+      ctx.strokeStyle = p.green;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(w / 2, h / 2, rR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = p.yellow;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - rR, h / 2); ctx.lineTo(w / 2 - rR + 4, h / 2);
+      ctx.moveTo(w / 2 + rR, h / 2); ctx.lineTo(w / 2 + rR - 4, h / 2);
+      ctx.moveTo(w / 2, h / 2 - rR); ctx.lineTo(w / 2, h / 2 - rR + 4);
+      ctx.moveTo(w / 2, h / 2 + rR); ctx.lineTo(w / 2, h / 2 + rR - 4);
+      ctx.stroke();
+      ctx.fillStyle = p.pink;
+      ctx.fillRect(w / 2 - 1, h / 2 - 1, 2, 2);
+
+      // Tiny gun corner
+      ctx.fillStyle = p.chrome;
+      ctx.fillRect(w - 22, h - 12, 18, 8);
+      ctx.fillStyle = '#3a3a3a';
+      ctx.fillRect(w - 14, h - 18, 8, 6);
+    },
     reactionRace: function (ctx, t, w, h, p) {
       ctx.fillStyle = p.ink; ctx.fillRect(0, 0, w, h);
       var n = 5;
