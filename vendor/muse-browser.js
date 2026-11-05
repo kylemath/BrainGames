@@ -748,13 +748,39 @@
           } else if (sub.type === 'optics') {
             const nSamples = sub.values[0] ? sub.values[0].length : 3;
             const tracked = this._trackAthenaSubpacket(sub.tag, sub.index, nSamples, PPG_FREQUENCY);
-            const maxPpg = Math.min(sub.values.length, 4);
-            for (let ch = 0; ch < maxPpg; ch++) {
+            // Map 16-ch (0x36: p1041/p1042), 8-ch (0x35: p1034), or 4-ch (0x34: p1035) optics
+            // to [0: ambient, 1: infrared (850nm), 2: red (660nm), 3: optics4/nir (730nm)]
+            let mappedChannels;
+            if (sub.values.length >= 16) {
+              mappedChannels = [
+                sub.values[14], // 0: ambient (LI_AMB)
+                sub.values[6],  // 1: infrared (LI_IR 850nm)
+                sub.values[12], // 2: red (LI_RED 660nm)
+                sub.values[4]   // 3: optics4 / nir (LI_NIR 730nm)
+              ];
+            } else if (sub.values.length >= 8) {
+              mappedChannels = [
+                sub.values[0],  // 0: LO_NIR
+                sub.values[6],  // 1: LI_IR 850nm
+                sub.values[7],  // 2: RI_IR 850nm
+                sub.values[4]   // 3: LI_NIR 730nm
+              ];
+            } else {
+              mappedChannels = [
+                sub.values[0],  // 0: LI_NIR 730nm
+                sub.values[2] || sub.values[1], // 1: LI_IR 850nm
+                sub.values[3] || sub.values[2], // 2: RI_IR 850nm
+                sub.values[1]   // 3: RI_NIR 730nm
+              ];
+            }
+            for (let ch = 0; ch < mappedChannels.length; ch++) {
+              if (!mappedChannels[ch]) continue;
               this.ppgReadings.next({
                 index: tracked.unwrappedCount,
                 ppgChannel: ch,
                 channelName: PPG_CHANNEL_NAMES[ch] || `optics${ch + 1}`,
-                samples: sub.values[ch],
+                samples: mappedChannels[ch],
+                allOptics: sub.values,
                 timestamp: tracked.timestamp
               });
             }
@@ -798,7 +824,10 @@
         } catch (_) {}
       }
 
-      const preset = this.preset || (this.enableAux ? 'p1045' : ATHENA_DEFAULT_PRESET);
+      const defaultAthenaPreset = this.enablePpg
+        ? 'p1041'
+        : (this.enableAux ? 'p1045' : ATHENA_DEFAULT_PRESET);
+      const preset = this.preset || defaultAthenaPreset;
       this.preset = preset;
       const sequence = [
         ['v6', 200],
@@ -839,6 +868,50 @@
         return;
       }
       await this.sendCommand('d');
+    }
+
+    /**
+     * Dynamically switch PPG / bright Red LED optical mode on or off while connected.
+     * On Muse S Athena:
+     *   - enabled=true  -> 'p1041' (16-ch optics + BRIGHT Red 660nm LED + 850nm IR + 730nm NIR)
+     *   - enabled=false -> 'p1035' (4-ch dim IR-only sleep mode, Red LED off)
+     * On Classic Muse 2 / Muse S:
+     *   - enabled=true  -> 'p50' (EEG + 3-ch PPG, Red/IR LEDs on)
+     *   - enabled=false -> 'p21' (EEG only, PPG LEDs off)
+     */
+    async setPPGMode(enabled = true) {
+      this.enablePpg = Boolean(enabled);
+      if (!this.controlChar || !this.gatt || !this.gatt.connected) {
+        this.preset = null;
+        return;
+      }
+      if (this.isAthena) {
+        const nextPreset = this.enablePpg ? 'p1041' : (this.enableAux ? 'p1045' : 'p1035');
+        this.preset = nextPreset;
+        await this.sendCommand('h');
+        await this.delay(150);
+        await this.sendCommand(nextPreset);
+        await this.delay(150);
+        await this.sendCommand('s');
+        await this.delay(150);
+        await this.sendCommand('dc001');
+        await this.delay(50);
+        await this.sendCommand('dc001');
+        await this.delay(100);
+        await this.sendCommand('L1');
+        await this.delay(150);
+        await this.sendCommand('s');
+      } else {
+        const nextPreset = this.enablePpg ? (this.enableAux ? 'p51' : 'p50') : (this.enableAux ? 'p20' : 'p21');
+        this.preset = nextPreset;
+        await this.sendCommand('h');
+        await this.delay(100);
+        await this.sendCommand(nextPreset);
+        await this.delay(100);
+        await this.sendCommand('s');
+        await this.delay(100);
+        await this.sendCommand('d');
+      }
     }
 
     async deviceInfo() {
