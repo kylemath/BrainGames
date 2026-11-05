@@ -28,6 +28,20 @@
     historyLength: 1000,
     sampleRate: 256,
 
+    // PPG / Optical channels (Muse 2, Muse S, Muse S Athena @ 64 Hz)
+    ppg: [0, 0, 0, 0],
+    ppgNormalized: [0, 0, 0, 0],
+    ppgPulse: 0,
+    heartRate: 0,
+    ppgSampleRate: 64,
+    ppgHistoryLength: 256,
+    ppgHistory: {
+      ambient: [],
+      infrared: [],
+      red: [],
+      optics4: []
+    },
+
     attention: 0,
     meditation: 0,
     connected: false,
@@ -50,6 +64,34 @@
 
     getChannelNames: function () {
       return ['TP9', 'AF7', 'AF8', 'TP10'];
+    },
+
+    getPPGChannel: function (channel, numSamples) {
+      if (channel === undefined) channel = 'infrared';
+      if (numSamples === undefined) numSamples = 64;
+      var aliasMap = {
+        0: 'ambient', '0': 'ambient', 'ambient': 'ambient', 'ppg1': 'ambient', 'li_730': 'ambient',
+        1: 'infrared', '1': 'infrared', 'infrared': 'infrared', 'ir': 'infrared', 'ppg2': 'infrared', 'ri_730': 'infrared',
+        2: 'red', '2': 'red', 'red': 'red', 'ppg3': 'red', 'li_850': 'red',
+        3: 'optics4', '3': 'optics4', 'optics4': 'optics4', 'ppg4': 'optics4', 'ri_850': 'optics4'
+      };
+      var key = aliasMap[typeof channel === 'string' ? channel.toLowerCase() : channel] || channel;
+      var channelData = (this.ppgHistory && this.ppgHistory[key]) || [];
+      return channelData.slice(-numSamples);
+    },
+
+    getAllPPGChannels: function (numSamples) {
+      if (numSamples === undefined) numSamples = 64;
+      return {
+        ambient: this.getPPGChannel('ambient', numSamples),
+        infrared: this.getPPGChannel('infrared', numSamples),
+        red: this.getPPGChannel('red', numSamples),
+        optics4: this.getPPGChannel('optics4', numSamples)
+      };
+    },
+
+    getPPGChannelNames: function () {
+      return ['ambient', 'infrared', 'red', 'optics4'];
     },
 
     // Most recent N samples transposed so each entry is [TP9, AF7, AF8, TP10]

@@ -57,6 +57,7 @@
 
       this._log('Step 3: Creating MuseClient instance...', 'info');
       this.muse = new global.muse.MuseClient();
+      this.muse.enablePpg = true;
       this._log('MuseClient created successfully', 'success');
 
       this._log('Step 4: Opening Bluetooth device selector...', 'info');
@@ -72,6 +73,13 @@
       });
       this.subscriptions.push(eegSubscription);
       this._log('EEG data subscription active', 'success');
+
+      if (this.muse.ppgReadings) {
+        var ppgSubscription = this.muse.ppgReadings.subscribe(function (reading) {
+          self.processPPGReading(reading);
+        });
+        this.subscriptions.push(ppgSubscription);
+      }
 
       var accelSubscription = this.muse.accelerometerData.subscribe(function (/* accel */) {
         // Movement detection can be added here later.
@@ -97,14 +105,15 @@
 
       this._log('All subscriptions configured', 'success');
 
-      this._log('Step 6: Starting EEG data stream...', 'info');
+      this._log('Step 6: Starting EEG data stream (auto-detecting Athena vs Classic firmware)...', 'info');
       await this.muse.start();
 
       this.isConnected = true;
       if (eegData) eegData.connected = true;
-      this._status('Connected to Muse', 'connected');
+      var modeLabel = this.muse.isAthena ? 'Athena (' + this.muse.preset + ')' : 'Classic';
+      this._status('Connected to ' + (this.muse.deviceName || 'Muse') + ' [' + modeLabel + ']', 'connected');
 
-      this._log('SUCCESS! Muse is connected and streaming data', 'success');
+      this._log('SUCCESS! ' + (this.muse.deviceName || 'Muse') + ' (' + modeLabel + ') is connected and streaming data', 'success');
     } catch (error) {
       this._log('Connection failed: ' + error.message, 'error');
       this.isConnected = false;
@@ -188,6 +197,53 @@
     if (this.dataBuffer.length % 100 === 0) {
       var dataRate = (this.dataBuffer.length / 4).toFixed(0);
       this._status('Connected (' + dataRate + ' packets/ch)', 'connected');
+    }
+  };
+
+  MuseEEGManager.prototype.processPPGReading = function (reading) {
+    var eegData = global.eegData;
+    if (!eegData || !reading || !reading.samples || reading.samples.length === 0) return;
+
+    var ppgNames = ['ambient', 'infrared', 'red', 'optics4'];
+    var chIndex = typeof reading.ppgChannel === 'number'
+      ? reading.ppgChannel
+      : ppgNames.indexOf(reading.channelName);
+    if (chIndex < 0 || chIndex >= 4) return;
+
+    var chName = ppgNames[chIndex];
+    var latest = reading.samples[reading.samples.length - 1];
+    if (Array.isArray(eegData.ppg)) {
+      eegData.ppg[chIndex] = latest;
+    }
+
+    if (eegData.ppgHistory) {
+      if (!eegData.ppgHistory[chName]) eegData.ppgHistory[chName] = [];
+      var hist = eegData.ppgHistory[chName];
+      for (var i = 0; i < reading.samples.length; i++) {
+        hist.push(reading.samples[i]);
+      }
+      var maxLen = eegData.ppgHistoryLength || 256;
+      if (hist.length > maxLen) {
+        eegData.ppgHistory[chName] = hist.slice(-maxLen);
+      }
+
+      var windowSamples = eegData.ppgHistory[chName].slice(-128);
+      if (windowSamples.length >= 8) {
+        var minVal = Infinity;
+        var maxVal = -Infinity;
+        for (var j = 0; j < windowSamples.length; j++) {
+          if (windowSamples[j] < minVal) minVal = windowSamples[j];
+          if (windowSamples[j] > maxVal) maxVal = windowSamples[j];
+        }
+        var span = maxVal - minVal;
+        var norm = span > 1e-3 ? Math.max(0, Math.min(1, (latest - minVal) / span)) : 0.5;
+        if (Array.isArray(eegData.ppgNormalized)) {
+          eegData.ppgNormalized[chIndex] = norm;
+        }
+        if (chIndex === 1) {
+          eegData.ppgPulse = norm;
+        }
+      }
     }
   };
 
